@@ -74,7 +74,7 @@ namespace AvaLab.DispatchR.Test
             var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
                 _dispatcher.Query(query));
 
-            Assert.Contains("No command handler registered", exception.Message);
+            Assert.Contains("No query handler registered", exception.Message);
             Assert.Contains(nameof(TestQuery), exception.Message);
         }
 
