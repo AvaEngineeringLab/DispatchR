@@ -50,7 +50,7 @@ jobs:
       - name: ⚠️ PUSH PACKAGE
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
-          PKG_PATH="./nupkgs/Ava.Engineering.Lab.DispatchR.${VERSION}.nupkg"
+          PKG_PATH="./nupkgs/AvaLabDispatcher.${VERSION}.nupkg"
 
           echo "📤 Pushing package to NuGet.org..."
           echo "   Path: $PKG_PATH"
