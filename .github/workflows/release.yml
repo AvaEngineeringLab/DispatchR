@@ -4,7 +4,6 @@ on:
   release:
     types: [created]
 
-# Prevent duplicate runs for the same release/tag
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
@@ -12,51 +11,99 @@ concurrency:
 jobs:
   pack_and_push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Set up .NET
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          
+
+      - name: Extract version from tag (e.g., v1.0.0 → 1.0.0)
+        id: get_version
+        run: |
+          VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "📦 Publishing version: $VERSION"
+
       - name: Pack NuGet package
         run: |
-          VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
-          echo "📦 Packing version: $VERSION"
-          
+          VERSION=${{ steps.get_version.outputs.version }}
           dotnet pack src/AvaLab.DispatchR/AvaLab.DispatchR.csproj \
             -c Release \
-            -o ./nupkgs/avalab \
+            -o ./nupkgs \
             -p:Version=$VERSION \
             -p:PackageVersion=$VERSION \
-            -p:IncludeSymbols=true \
-            -p:SymbolPackageFormat=snupkg
+            -p:Deterministic=true \
+            -p:ContinuousIntegrationBuild=true
 
-      - name: Push main package to NuGet.org
+      - name: 🔍 Verify package metadata (catch trailing spaces early)
         run: |
-          VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
-          PKG_PATH="./nupkgs/avalab/AvaLab.DispatchR.${VERSION}.nupkg"
+          VERSION=${{ steps.get_version.outputs.version }}
+          PKG_PATH="./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg"
+          
+          echo "🔍 Checking package metadata for trailing spaces..."
+          unzip -p "$PKG_PATH" *.nuspec | grep -E "(projectUrl|licenseUrl|iconUrl)" | while read line; do
+            if [[ "$line" == *"  "* ]]; then
+              echo "❌ CRITICAL: Trailing spaces detected in metadata!"
+              echo "   Line: $line"
+              echo "   → Fix your .csproj: Remove ALL trailing spaces in URLs"
+              exit 1
+            fi
+          done
+          echo "✅ No trailing spaces found in package metadata"
+
+      - name: "🔒 CRITICAL: Check if version is RESERVED on NuGet.org"
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+          PACKAGE_ID="AvaLab.DispatchR"
+          
+          URL="https://www.nuget.org/api/v2/Packages(Id='%27$PACKAGE_ID%27',Version='%27$VERSION%27')"
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Accept: application/atom+xml" "$URL")
+          
+          echo "🔍 Checking if $PACKAGE_ID@$VERSION exists on NuGet.org..."
+          echo "   HTTP Status: $HTTP_CODE"
+          
+          if [ "$HTTP_CODE" = "200" ]; then
+            echo ""
+            echo "❌ FATAL: Version $VERSION is ALREADY RESERVED!"
+            echo "   → This happens even if package is not visible on nuget.org"
+            echo "   → NuGet.org permanently reserves versions after ANY publish attempt"
+            echo ""
+            echo "✅ SOLUTION:"
+            echo "   1. DELETE this GitHub release: ${{ github.ref_name }}"
+            echo "   2. CREATE a NEW release with a FRESH version (e.g., v1.0.1, v2.0.0)"
+            echo "   3. NEVER reuse version numbers — they are immutable!"
+            echo ""
+            echo "💡 Pro tip: Use semantic versioning with prerelease tags for testing:"
+            echo "   Example tags: v1.0.0-alpha.1, v1.0.0-beta.2"
+            exit 1
+          else
+            echo "✅ Version $VERSION is AVAILABLE — proceeding to push"
+          fi
+
+      - name: Push package to NuGet.org
+        run: |
+          VERSION=${{ steps.get_version.outputs.version }}
+          PKG_PATH="./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg"
           
           echo "📤 Pushing: $PKG_PATH"
           dotnet nuget push "$PKG_PATH" \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate
+            --skip-duplicate \
+            --timeout 600
 
-      - name: Push symbols package to NuGet.org
+      - name: ✅ Success message
+        if: success()
         run: |
-          VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
-          SYMBOL_PKG_PATH="./nupkgs/avalab/AvaLab.DispatchR.${VERSION}.snupkg"
-          
-          if [ -f "$SYMBOL_PKG_PATH" ]; then
-            echo "📤 Pushing symbols: $SYMBOL_PKG_PATH"
-            dotnet nuget push "$SYMBOL_PKG_PATH" \
-              --api-key ${{ secrets.NUGET_API_KEY }} \
-              --source https://api.nuget.org/v3/index.json \
-              --symbol-source https://api.nuget.org/v3/index.json \
-              --skip-duplicate
-          else
-            echo "⚠️ Symbols package not found, skipping symbol push"
-          fi
+          VERSION=${{ steps.get_version.outputs.version }}
+          echo ""
+          echo "🎉 SUCCESS! Published AvaLab.DispatchR@$VERSION"
+          echo "🔗 https://www.nuget.org/packages/AvaLab.DispatchR/$VERSION"
+          echo ""
+          echo "⚠️  REMINDER: Never reuse this version number again!"
