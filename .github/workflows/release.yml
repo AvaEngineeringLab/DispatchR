@@ -30,10 +30,15 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "📦 Publishing version: $VERSION"
 
+      - name: Restore dependencies
+        run: dotnet restore src/AvaLab.DispatchR.sln
+
+      - name: Build entire solution
+        run: dotnet build src/AvaLab.DispatchR.sln --no-restore --configuration Release
+
       - name: Pack NuGet package
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
-          dotnet build src/AvaLab.DispatchR.sln --no-restore --configuration Release
           dotnet pack src/AvaLab.DispatchR/AvaLab.DispatchR.csproj \
             -c Release \
             -o ./nupkgs \
