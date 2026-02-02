@@ -45,7 +45,7 @@ v0.1.0 (Initial release)
 		<!-- License & packaging -->
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<PackageReadmeFile>../README.md</PackageReadmeFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -77,9 +77,5 @@ Provides a minimal, opinionated API for dispatching commands, queries, and event
   <ItemGroup>
     <ProjectReference Include="..\AvaLab.DispatchR.Abstraction\AvaLab.DispatchR.Abstraction.csproj" />
   </ItemGroup>
-
-	<ItemGroup>
-		<None Include="../README.md" Pack="true" PackagePath="\" />
-	</ItemGroup>
 
 </Project>
