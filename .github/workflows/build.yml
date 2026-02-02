@@ -25,4 +25,4 @@ jobs:
         run: dotnet build src/AvaLab.DispatchR.sln --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test src/AvaLab.DispatchR.Test/AvaLab.DispatchR.Test.csproj  --no-build --verbosity normal
+        run: dotnet test src/AvaLab.DispatchR.Test/AvaLab.DispatchR.Test.csproj --verbosity normal
