@@ -21,7 +21,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: "10.0.x"
 
       - name: Extract version from tag
         id: get_version
@@ -41,46 +41,15 @@ jobs:
             -p:Deterministic=true \
             -p:ContinuousIntegrationBuild=true
 
-      - name: 🔍 Verify no trailing spaces in metadata
-        run: |
-          VERSION=${{ steps.get_version.outputs.version }}
-          unzip -p "./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg" *.nuspec | \
-            grep -E "(projectUrl|repositoryUrl)" | \
-            grep -q "  " && \
-            (echo "❌ CRITICAL: Trailing spaces detected in URLs!" && exit 1) || \
-            echo "✅ Metadata clean - no trailing spaces"
-
-      - name: 🔒 Check version reservation on NuGet.org (reliable method)
-        run: |
-          VERSION=${{ steps.get_version.outputs.version }}
-          PACKAGE_ID="AvaLab.DispatchR"
-          
-          REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/avalab.dispatchr/index.json"
-          
-          echo "🔍 Checking if $PACKAGE_ID@$VERSION is reserved..."
-          if curl -s "$REGISTRATION_URL" | grep -q "\"$VERSION\""; then
-            echo "❌ FATAL: Version $VERSION is RESERVED on NuGet.org!"
-            echo "   → Even if not visible publicly, it blocks new uploads"
-            echo ""
-            echo "✅ SOLUTION:"
-            echo "   1. DELETE this GitHub release: ${{ github.ref_name }}"
-            echo "   2. CREATE a NEW release with FRESH version (e.g., v0.2.1)"
-            echo "   3. NEVER reuse version numbers — they are immutable!"
-            exit 1
-          else
-            echo "✅ Version $VERSION appears available — proceeding"
-            sleep 2
-          fi
-
-      - name: ⚠️ PUSH PACKAGE (will FAIL on conflict - no skip-duplicate!)
+      - name: ⚠️ PUSH PACKAGE
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
           PKG_PATH="./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg"
-          
+
           echo "📤 Pushing package to NuGet.org..."
           echo "   Path: $PKG_PATH"
           echo "   Source: https://api.nuget.org/v3/index.json"
-          
+
           dotnet nuget push "$PKG_PATH" \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \

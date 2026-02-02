@@ -1,51 +1,54 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <Authors>AvaEngineeringLab</Authors>
-    <Company>AvaEngineeringLab</Company>
-    <Product>AvaLab.DispatchR</Product>
-    <Title>AvaLab.DispatchR</Title>
-    <PackageId>AvaLab.DispatchR</PackageId>
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<LangVersion>latest</LangVersion>
+		<PackageId>Ava.Engineering.Lab.DispatchR</PackageId>
+		<Version>1.0.0</Version>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<Authors>AvaProtein</Authors>
+		<Company>AvaProtein</Company>
+		<Product>Ava.DispatchR</Product>
+		<Copyright>Copyright © AvaProtein $(Year)</Copyright>
+		<Title>Ava.DispatchR</Title>
+		<Description>Lightweight messaging and dispatching abstraction with DI-friendly registration. Provides a minimal, opinionated API for dispatching commands, queries, and events.</Description>
+		<Summary>A simple and efficient Mediator pattern implementation for message dispatching in .NET, enabling loosely coupled communication between components. It facilitates the use of commands, queries, and events in a CQRS-based architecture, with support for dependency injection (DI) and minimal configuration.</Summary>
+		<PackageTags>dotnet;csharp;mediator;dispatcher;command;query;cqs;cqrs;framework</PackageTags>
+		<PackageProjectUrl>https://github.com/AvaEngineeringLab/DispatchR</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/AvaEngineeringLab/DispatchR</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryBranch>main</RepositoryBranch>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<Deterministic>true</Deterministic>
+		<ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+		<AssemblyTitle>Ava.DispatchR</AssemblyTitle>
+		<AssemblyDescription>Lightweight messaging and dispatching abstraction with DI-friendly registration. Provides a minimal, opinionated API for dispatching commands, queries, and events.</AssemblyDescription>
+		<AssemblyConfiguration>$(Configuration)</AssemblyConfiguration>
+		<AssemblyCompany>AvaProtein</AssemblyCompany>
+		<AssemblyProduct>Ava.DispatchR</AssemblyProduct>
+		<AssemblyCopyright>Copyright © AvaProtein $(Year)</AssemblyCopyright>
+		<NeutralLanguage>en-US</NeutralLanguage>
+	</PropertyGroup>
 
-    <Description>
-Lightweight messaging and dispatching abstraction with DI-friendly registration.
-Provides a minimal, opinionated API for dispatching commands, queries, and events.
-    </Description>
-    <Summary>
-A simple and efficient Mediator pattern implementation for message dispatching in .NET, enabling loosely coupled communication between components. It facilitates the use of commands, queries, and events in a CQRS-based architecture, with support for dependency injection (DI) and minimal configuration.
-    </Summary>
-    <PackageTags>dotnet;csharp;mediator;dispatcher;command;query;cqs;cqrs;framework</PackageTags>
-    <PackageProjectUrl>https://github.com/AvaEngineeringLab/DispatchR</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/AvaEngineeringLab/DispatchR</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryBranch>main</RepositoryBranch>
-
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <Deterministic>true</Deterministic>
-    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-
-    <AssemblyTitle>AvaLab.DispatchR</AssemblyTitle>
-    <AssemblyDescription>
-Lightweight messaging and dispatching abstraction with DI-friendly registration.
-Provides a minimal, opinionated API for dispatching commands, queries, and events.
-    </AssemblyDescription>
-    <AssemblyCompany>AvaEngineeringLab</AssemblyCompany>
-    <AssemblyProduct>AvaLab.DispatchR</AssemblyProduct>
-    <NeutralLanguage>en-US</NeutralLanguage>
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<Optimize>true</Optimize>
+		<DebugType>portable</DebugType>
+		<DebugSymbols>true</DebugSymbols>
+	</PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
