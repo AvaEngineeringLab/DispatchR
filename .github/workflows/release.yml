@@ -4,20 +4,59 @@ on:
   release:
     types: [created]
 
+# Prevent duplicate runs for the same release/tag
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pack_and_push:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
+      
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
           
-      - name: Pack and push NuGet packages
+      - name: Pack NuGet package
         run: |
           VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
+          echo "📦 Packing version: $VERSION"
+          
+          dotnet pack src/AvaLab.DispatchR/AvaLab.DispatchR.csproj \
+            -c Release \
+            -o ./nupkgs/avalab \
+            -p:Version=$VERSION \
+            -p:PackageVersion=$VERSION \
+            -p:IncludeSymbols=true \
+            -p:SymbolPackageFormat=snupkg
 
-          dotnet pack src/AvaLab.DispatchR/AvaLab.DispatchR.csproj -c release -o ./nupkgs/avalab /p:Version=$VERSION -p:PackageVersion=$VERSION
-          dotnet nuget push "./nupkgs/avalab/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+      - name: Push main package to NuGet.org
+        run: |
+          VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
+          PKG_PATH="./nupkgs/avalab/AvaLab.DispatchR.${VERSION}.nupkg"
+          
+          echo "📤 Pushing: $PKG_PATH"
+          dotnet nuget push "$PKG_PATH" \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Push symbols package to NuGet.org
+        run: |
+          VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
+          SYMBOL_PKG_PATH="./nupkgs/avalab/AvaLab.DispatchR.${VERSION}.snupkg"
+          
+          if [ -f "$SYMBOL_PKG_PATH" ]; then
+            echo "📤 Pushing symbols: $SYMBOL_PKG_PATH"
+            dotnet nuget push "$SYMBOL_PKG_PATH" \
+              --api-key ${{ secrets.NUGET_API_KEY }} \
+              --source https://api.nuget.org/v3/index.json \
+              --symbol-source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          else
+            echo "⚠️ Symbols package not found, skipping symbol push"
+          fi
