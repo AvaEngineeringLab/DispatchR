@@ -50,7 +50,7 @@ jobs:
       - name: ⚠️ PUSH PACKAGE
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
-          PKG_PATH="./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg"
+          PKG_PATH="./nupkgs/Ava.Engineering.Lab.DispatchR.${VERSION}.nupkg"
 
           echo "📤 Pushing package to NuGet.org..."
           echo "   Path: $PKG_PATH"
@@ -59,6 +59,7 @@ jobs:
           dotnet nuget push "$PKG_PATH" \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate \
             --timeout 600 || exit 1
 
       - name: ✅ SUCCESS - Package published
