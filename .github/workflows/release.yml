@@ -15,4 +15,4 @@ jobs:
           VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
 
           dotnet pack src/AvaLab.DispatchR/AvaLab.DispatchR.csproj -c release -o ./nupkgs/avalab /p:Version=$VERSION -p:PackageVersion=$VERSION
-          dotnet nuget push "./nupkgs/avalab/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          nuget push "./nupkgs/avalab/AvaLab.DispatchR.$VERSION.nupkg" -ApiKey ${{ secrets.NUGET_API_KEY }} -Source "https://api.nuget.org/v3/index.json" -SkipDuplicate
