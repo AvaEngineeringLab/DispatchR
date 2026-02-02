@@ -11,7 +11,7 @@ namespace AvaLab.DispatchR
             var queryType = query.GetType();
             var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, typeof(TResponse));
             dynamic handler = serviceProvider.GetService(handlerType)
-                ?? throw new InvalidOperationException($"No query handler registered for {queryType.Name} -> {typeof(TResponse).Name}");
+                ?? throw new InvalidOperationException($"No query handler registered for {queryType.Name} -> {typeof(TResponse).Name}.");
 
             return handler.Handle((dynamic)query, ct);
         }
@@ -23,7 +23,7 @@ namespace AvaLab.DispatchR
             var commandType = command.GetType();
             var handlerType = typeof(ICommandHandler<,>).MakeGenericType(commandType, typeof(TResponse));
             dynamic handler = serviceProvider.GetService(handlerType)
-                ?? throw new InvalidOperationException($"No command handler registered for {commandType.Name} -> {typeof(TResponse).Name}");
+                ?? throw new InvalidOperationException($"No command handler registered for {commandType.Name} -> {typeof(TResponse).Name}.");
 
             return handler.Handle((dynamic)command, ct);
         }
@@ -35,7 +35,7 @@ namespace AvaLab.DispatchR
             var commandType = command.GetType();
             var handlerType = typeof(ICommandHandler<>).MakeGenericType(commandType);
             dynamic handler = serviceProvider.GetService(handlerType)
-                ?? throw new InvalidOperationException($"No command handler registered for {commandType.Name} -> void");
+                ?? throw new InvalidOperationException($"No command handler registered for {commandType.Name} -> void.");
 
             return handler.Handle((dynamic)command, ct);
         }
