@@ -23,7 +23,7 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-      - name: Extract version from tag (e.g., v1.0.0 → 1.0.0)
+      - name: Extract version from tag
         id: get_version
         run: |
           VERSION=$(echo ${{ github.ref_name }} | sed 's/^v//')
@@ -41,69 +41,60 @@ jobs:
             -p:Deterministic=true \
             -p:ContinuousIntegrationBuild=true
 
-      - name: 🔍 Verify package metadata (catch trailing spaces early)
+      - name: 🔍 Verify no trailing spaces in metadata
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
-          PKG_PATH="./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg"
-          
-          echo "🔍 Checking package metadata for trailing spaces..."
-          unzip -p "$PKG_PATH" *.nuspec | grep -E "(projectUrl|licenseUrl|iconUrl)" | while read line; do
-            if [[ "$line" == *"  "* ]]; then
-              echo "❌ CRITICAL: Trailing spaces detected in metadata!"
-              echo "   Line: $line"
-              echo "   → Fix your .csproj: Remove ALL trailing spaces in URLs"
-              exit 1
-            fi
-          done
-          echo "✅ No trailing spaces found in package metadata"
+          unzip -p "./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg" *.nuspec | \
+            grep -E "(projectUrl|repositoryUrl)" | \
+            grep -q "  " && \
+            (echo "❌ CRITICAL: Trailing spaces detected in URLs!" && exit 1) || \
+            echo "✅ Metadata clean - no trailing spaces"
 
-      - name: "🔒 CRITICAL: Check if version is RESERVED on NuGet.org"
+      - name: 🔒 Check version reservation on NuGet.org (reliable method)
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
           PACKAGE_ID="AvaLab.DispatchR"
           
-          URL="https://www.nuget.org/api/v2/Packages(Id='%27$PACKAGE_ID%27',Version='%27$VERSION%27')"
-          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" -H "Accept: application/atom+xml" "$URL")
+          REGISTRATION_URL="https://api.nuget.org/v3/registration5-semver1/avalab.dispatchr/index.json"
           
-          echo "🔍 Checking if $PACKAGE_ID@$VERSION exists on NuGet.org..."
-          echo "   HTTP Status: $HTTP_CODE"
-          
-          if [ "$HTTP_CODE" = "200" ]; then
-            echo ""
-            echo "❌ FATAL: Version $VERSION is ALREADY RESERVED!"
-            echo "   → This happens even if package is not visible on nuget.org"
-            echo "   → NuGet.org permanently reserves versions after ANY publish attempt"
+          echo "🔍 Checking if $PACKAGE_ID@$VERSION is reserved..."
+          if curl -s "$REGISTRATION_URL" | grep -q "\"$VERSION\""; then
+            echo "❌ FATAL: Version $VERSION is RESERVED on NuGet.org!"
+            echo "   → Even if not visible publicly, it blocks new uploads"
             echo ""
             echo "✅ SOLUTION:"
             echo "   1. DELETE this GitHub release: ${{ github.ref_name }}"
-            echo "   2. CREATE a NEW release with a FRESH version (e.g., v1.0.1, v2.0.0)"
+            echo "   2. CREATE a NEW release with FRESH version (e.g., v0.2.1)"
             echo "   3. NEVER reuse version numbers — they are immutable!"
-            echo ""
-            echo "💡 Pro tip: Use semantic versioning with prerelease tags for testing:"
-            echo "   Example tags: v1.0.0-alpha.1, v1.0.0-beta.2"
             exit 1
           else
-            echo "✅ Version $VERSION is AVAILABLE — proceeding to push"
+            echo "✅ Version $VERSION appears available — proceeding"
+            sleep 2
           fi
 
-      - name: Push package to NuGet.org
+      - name: ⚠️ PUSH PACKAGE (will FAIL on conflict - no skip-duplicate!)
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
           PKG_PATH="./nupkgs/AvaLab.DispatchR.${VERSION}.nupkg"
           
-          echo "📤 Pushing: $PKG_PATH"
+          echo "📤 Pushing package to NuGet.org..."
+          echo "   Path: $PKG_PATH"
+          echo "   Source: https://api.nuget.org/v3/index.json"
+          
           dotnet nuget push "$PKG_PATH" \
             --api-key ${{ secrets.NUGET_API_KEY }} \
             --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate \
-            --timeout 600
+            --timeout 600 || exit 1
 
-      - name: ✅ Success message
+      - name: ✅ SUCCESS - Package published
         if: success()
         run: |
           VERSION=${{ steps.get_version.outputs.version }}
           echo ""
-          echo "🎉 SUCCESS! Published AvaLab.DispatchR@$VERSION"
+          echo "=================================================================="
+          echo "🎉 SUCCESS! AvaLab.DispatchR@$VERSION published to NuGet.org"
           echo "🔗 https://www.nuget.org/packages/AvaLab.DispatchR/$VERSION"
+          echo "=================================================================="
           echo ""
-          echo "⚠️  REMINDER: Never reuse this version number again!"
+          echo "⚠️  CRITICAL: Never reuse this version number again!"
+          echo "   NuGet.org permanently reserves versions after first publish."
