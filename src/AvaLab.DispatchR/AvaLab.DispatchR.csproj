@@ -1,75 +1,52 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>AvaEngineeringLab</Authors>
+    <Company>AvaEngineeringLab</Company>
+    <Product>AvaLab.DispatchR</Product>
+    <Title>AvaLab.DispatchR</Title>
+    <PackageId>AvaLab.DispatchR</PackageId>
 
-		<PackageId>AvaLab.DispatchR</PackageId>
-		<Version>0.0.0</Version>
-		<AssemblyVersion>0.0.0.0</AssemblyVersion>
-		<FileVersion>0.0.0.0</FileVersion>
-		<AssemblyInformationalVersion>0.0.0</AssemblyInformationalVersion>
-
-		<Authors>AvaEngineeringLab</Authors>
-		<Company>AvaEngineeringLab</Company>
-		<Product>AvaLab.DispatchR</Product>
-		<Title>AvaLab.DispatchR</Title>
-
-		<!-- Package metadata -->
-  <Description>
+    <Description>
 Lightweight messaging and dispatching abstraction with DI-friendly registration.
 Provides a minimal, opinionated API for dispatching commands, queries, and events.
-  </Description>
-  <Summary>
+    </Description>
+    <Summary>
 A simple and efficient Mediator pattern implementation for message dispatching in .NET, enabling loosely coupled communication between components. It facilitates the use of commands, queries, and events in a CQRS-based architecture, with support for dependency injection (DI) and minimal configuration.
-  </Summary>
-  <PackageReleaseNotes>
-v0.1.0 (Initial release)
-- Implemented basic Mediator pattern for command, query, and event dispatching.
-- Introduced a minimal abstraction for message publishing (IBus) with dependency injection support.
-- Provides DI registration for seamless integration into .NET applications.
-- Supports CQRS architecture with distinct handling for commands and queries.
-- Added XML documentation and symbols support (.snupkg) for better integration and debugging.
-  </PackageReleaseNotes>
-		<PackageTags>
-			dotnet;csharp;meditor;dispatcher;command;query;cqs;cqrs;framework
-		</PackageTags>
+    </Summary>
+    <PackageTags>dotnet;csharp;mediator;dispatcher;command;query;cqs;cqrs;framework</PackageTags>
+    <PackageProjectUrl>https://github.com/AvaEngineeringLab/DispatchR</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AvaEngineeringLab/DispatchR</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryBranch>main</RepositoryBranch>
 
-		<!-- Repository / links -->
-		<PackageProjectUrl>https://github.com/AvaEngineeringLab/DispatchR</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/AvaEngineeringLab/DispatchR</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<RepositoryBranch>main</RepositoryBranch>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-		<!-- License & packaging -->
-		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <Deterministic>true</Deterministic>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 
-		<!-- Build metadata -->
-		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-		<NoWarn>$(NoWarn);1591</NoWarn>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<EmbedUntrackedSources>true</EmbedUntrackedSources>
-		<Deterministic>true</Deterministic>
-		<ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
-
-		<!-- Assembly attributes -->
-		<AssemblyTitle>AvaLab.DispatchR</AssemblyTitle>
-		<AssemblyDescription>
+    <AssemblyTitle>AvaLab.DispatchR</AssemblyTitle>
+    <AssemblyDescription>
 Lightweight messaging and dispatching abstraction with DI-friendly registration.
 Provides a minimal, opinionated API for dispatching commands, queries, and events.
-		</AssemblyDescription>
-		<AssemblyConfiguration>$(Configuration)</AssemblyConfiguration>
-		<AssemblyCompany>AvaEngineeringLab</AssemblyCompany>
-		<AssemblyProduct>AvaLab.DispatchR</AssemblyProduct>
-		<NeutralLanguage>en-US</NeutralLanguage>
+    </AssemblyDescription>
+    <AssemblyCompany>AvaEngineeringLab</AssemblyCompany>
+    <AssemblyProduct>AvaLab.DispatchR</AssemblyProduct>
+    <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.2" />
   </ItemGroup>
@@ -78,8 +55,8 @@ Provides a minimal, opinionated API for dispatching commands, queries, and event
     <ProjectReference Include="..\AvaLab.DispatchR.Abstraction\AvaLab.DispatchR.Abstraction.csproj" />
   </ItemGroup>
 
-	<ItemGroup>
-		<None Include="README.md" Pack="true" PackagePath="\" />
-	</ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" Visible="false" />
+  </ItemGroup>
 
 </Project>
