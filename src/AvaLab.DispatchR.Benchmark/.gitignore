@@ -1,0 +1,12 @@
+# Benchmark artifacts
+BenchmarkDotNet.Artifacts/
+
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
